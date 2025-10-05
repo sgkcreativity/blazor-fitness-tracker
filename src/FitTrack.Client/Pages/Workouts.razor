@@ -1,0 +1,112 @@
+@page "/workouts"
+@using FitTrack.Client.Services
+@using FitTrack.Core.Models
+@using FitTrack.Core.Services
+@inject FitTrack.Client.Services.IWorkoutStore Store
+@inject IJSRuntime JS
+
+<h1>Workouts</h1>
+
+@if (items is null)
+{
+    <p>Loading…</p>
+}
+else if (items.Count == 0)
+{
+    <p>No workouts yet. <a href="/log">Log your first workout</a>.</p>
+}
+else
+{
+    <div class="toolbar">
+        <div class="totals">
+            <strong>Total:</strong>
+            @items.Count workouts · @WorkoutStats.TotalDurationMin(items) min ·
+            @WorkoutStats.TotalDistanceKm(items).ToString("0.##") km
+        </div>
+        <div class="actions">
+            <button @onclick="ExportCsv">Export CSV</button>
+            <button class="danger" @onclick="ClearAll">Clear All</button>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th><th>Type</th><th>Duration (min)</th><th>Distance (km)</th><th>Pace (min/km)</th><th>Notes</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var w in items.OrderByDescending(i => i.Date))
+        {
+            var pace = WorkoutStats.PaceMinPerKm(w);
+            <tr>
+                <td>@w.Date.ToShortDateString()</td>
+                <td>@w.Type</td>
+                <td>@w.DurationMin</td>
+                <td>@(w.DistanceKm?.ToString("0.00") ?? "-")</td>
+                <td>@(pace.HasValue ? pace.Value.ToString("0.00") : "-")</td>
+                <td>@w.Notes</td>
+                <td class="row-actions">
+                    <button class="link danger" @onclick="() => Delete(w.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<style>
+table { width:100%; border-collapse:collapse; margin-top:.5rem; }
+th, td { padding:.5rem; border-bottom:1px solid var(--border, #eee); text-align:left; }
+thead th { border-bottom:2px solid var(--border, #ddd); }
+.toolbar { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin:.5rem 0; flex-wrap:wrap; }
+.actions { display:flex; gap:.5rem; }
+button { padding:.45rem .8rem; border-radius:.5rem; border:1px solid var(--border, #ddd); background:var(--card,#f9f9f9); cursor:pointer; }
+button.danger { border-color:#c43; }
+button.link { background:none; border:none; color:#c43; cursor:pointer; padding:0; }
+.row-actions { text-align:right; white-space:nowrap; }
+</style>
+
+@code {
+    private List<Workout>? items;
+
+    protected override async Task OnInitializedAsync()
+        => items = (await Store.GetAllAsync()).ToList();
+
+    private async Task Delete(Guid id)
+    {
+        var ok = await JS.InvokeAsync<bool>("confirm", "Delete this workout?");
+        if (!ok) return;
+        await Store.RemoveAsync(id);
+        items = (await Store.GetAllAsync()).ToList();
+    }
+
+    private async Task ClearAll()
+    {
+        var ok = await JS.InvokeAsync<bool>("confirm", "Clear ALL workouts? This cannot be undone.");
+        if (!ok) return;
+        await Store.ClearAsync();
+        items = (await Store.GetAllAsync()).ToList();
+    }
+
+    private async Task ExportCsv()
+    {
+        if (items is null || items.Count == 0) return;
+        var lines = new List<string> { "Id,Date,Type,DurationMin,DistanceKm,Calories,Notes" };
+        foreach (var w in items)
+        {
+            string esc(string? s) => s is null ? "" : "\"" + s.Replace("\"","\"\"") + "\"";
+            lines.Add(string.Join(",",
+                w.Id,
+                w.Date.ToString("yyyy-MM-dd"),
+                w.Type,
+                w.DurationMin,
+                w.DistanceKm?.ToString("0.##") ?? "",
+                w.Calories?.ToString() ?? "",
+                esc(w.Notes)
+            ));
+        }
+        var csv = string.Join("\r\n", lines);
+        await JS.InvokeVoidAsync("fittrack.downloadFile", "workouts.csv", csv, "text/csv");
+    }
+}

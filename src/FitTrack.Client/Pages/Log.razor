@@ -1,0 +1,46 @@
+@page "/log"
+@using FitTrack.Core.Models
+@using FitTrack.Client.Services
+@inject FitTrack.Client.Services.IWorkoutStore Store
+@inject NavigationManager Nav
+
+<h2>Log Workout</h2>
+
+<EditForm Model="@model" OnValidSubmit="Save">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="grid">
+        <label>Date <InputDate @bind-Value="model.Date" /></label>
+        <label>Type
+            <InputSelect @bind-Value="model.Type">
+                @foreach (var t in Enum.GetValues<WorkoutType>())
+                {
+                    <option value="@t">@t</option>
+                }
+            </InputSelect>
+        </label>
+        <label>Duration (min) <InputNumber @bind-Value="model.DurationMin" /></label>
+        <label>Distance (km) <InputNumber @bind-Value="model.DistanceKm" /></label>
+        <label>Calories <InputNumber @bind-Value="model.Calories" /></label>
+        <label>Notes <InputTextArea @bind-Value="model.Notes" rows="3"/></label>
+        <ValidationMessage For="() => model.DurationMin" />
+    </div>
+    <button type="submit">Save</button>
+    
+</EditForm>
+
+<style>
+.grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin:1rem 0; }
+label { display:flex; flex-direction:column; gap:0.25rem; }
+button { padding:.6rem 1rem; }
+</style>
+
+@code {
+    private Workout model = new() { DurationMin = 30 };
+
+    private async Task Save()
+    {
+        await Store.AddAsync(model);
+        Nav.NavigateTo("/workouts");
+    }
+}

@@ -1,0 +1,55 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">FitTrack</a>
+        <button class="btn btn-sm btn-secondary" @onclick="ToggleTheme">@themeLabel</button>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Dashboard
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/log">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Log Workout
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/workouts">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Workouts
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+
+    [Inject] private ThemeService? Theme { get; set; }
+    private string themeLabel = "Dark";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Theme is null) return;
+        var t = await Theme.GetAsync();
+        themeLabel = t == "dark" ? "Light" : "Dark";
+    }
+
+    private async Task ToggleTheme()
+    {
+        if (Theme is null) return;
+        var current = await Theme.GetAsync();
+        var next = current == "dark" ? "light" : "dark";
+        await Theme.SetAsync(next);
+        themeLabel = next == "dark" ? "Light" : "Dark";
+        StateHasChanged();
+    }
+}

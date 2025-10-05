@@ -1,0 +1,51 @@
+@page "/"
+@using FitTrack.Client.Services
+@using FitTrack.Core.Models
+@using FitTrack.Core.Services
+@inject FitTrack.Client.Services.IWorkoutStore Store
+
+<h1>Fitness Dashboard</h1>
+
+@if (items is null)
+{
+    <p>Loading…</p>
+}
+else
+{
+    <div class="cards">
+        <section class="card">
+            <h3>All Time</h3>
+            <p>@items.Count workouts</p>
+            <p>@WorkoutStats.TotalDurationMin(items) min</p>
+            <p>@WorkoutStats.TotalDistanceKm(items).ToString("0.##") km</p>
+        </section>
+
+        <section class="card">
+            <h3>This Week</h3>
+            <p>@weekCount workouts</p>
+            <p>@weekMinutes min</p>
+            <p>@weekKm.ToString("0.##") km</p>
+        </section>
+    </div>
+}
+
+<style>
+.cards{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:1rem; }
+.card{ padding:1rem; border:1px solid #eee; border-radius:.75rem; }
+</style>
+
+@code {
+    private IReadOnlyList<Workout>? items;
+    private int weekCount, weekMinutes;
+    private double weekKm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = await Store.GetAllAsync();
+        var start = DateTime.Today.AddDays(-6);
+        var week = items.Where(i => i.Date.Date >= start && i.Date.Date <= DateTime.Today).ToList();
+        weekCount = week.Count;
+        weekMinutes = week.Sum(i => i.DurationMin);
+        weekKm = week.Where(i => i.DistanceKm.HasValue).Sum(i => i.DistanceKm!.Value);
+    }
+}
