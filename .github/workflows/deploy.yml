@@ -1,0 +1,58 @@
+﻿name: Build & Deploy Blazor WASM to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+env:
+  REPO_NAME: blazor-fitness-tracker
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Publish Blazor WASM
+        run: dotnet publish src/FitTrack.Client/FitTrack.Client.csproj -c Release -o build/publish
+
+      # Adjust the <base href> for project Pages (https://<you>.github.io/blazor-fitness-tracker/)
+      - name: Set base href for GitHub Pages subpath
+        run: |
+          sed -i 's#<base href="/" />#<base href="/${{ env.REPO_NAME }}/" />#' build/publish/wwwroot/index.html
+
+      # Make deep links work on refresh (SPA fallback)
+      - name: Add 404.html SPA fallback
+        run: cp build/publish/wwwroot/index.html build/publish/wwwroot/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/publish/wwwroot
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
