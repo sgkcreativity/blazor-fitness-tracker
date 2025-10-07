@@ -36,33 +36,34 @@ A lightweight fitness tracker built with **Blazor WebAssembly (.NET 8)**. Log wo
 ---
 
 ## 📁 Project Structure
-src/
-FitTrack.Core/
-Models/
-Workout.cs
-WorkoutType.cs
-Services/
-WorkoutStats.cs # pure domain helpers (no UI/JS)
-FitTrack.Client/
-Layout/
-MainLayout.razor
-NavMenu.razor
-Pages/
-Index.razor # dashboard
-Log.razor # log a workout
-Workouts.razor # list + export/delete/clear
-Services/
-IWorkoutStore.cs
-LocalStorageWorkoutStore.cs
-InMemoryWorkoutStore.cs # optional for dev/tests
-ThemeService.cs
-wwwroot/
-css/app.css
-js/interop.js
-tests/
-FitTrack.Core.Tests/
-WorkoutStatsTests.cs
 
+src/
+  FitTrack.Core/
+    Models/
+      Workout.cs
+      WorkoutType.cs
+    Services/
+      WorkoutStats.cs
+  FitTrack.Client/
+    Layout/
+      MainLayout.razor
+      NavMenu.razor
+    Pages/
+      Index.razor
+      Log.razor
+      Workouts.razor
+    Services/
+      IWorkoutStore.cs
+      LocalStorageWorkoutStore.cs
+      InMemoryWorkoutStore.cs
+      ThemeService.cs
+    wwwroot/
+      css/app.css
+      js/interop.js
+tests/
+  FitTrack.Core.Tests/
+    WorkoutStatsTests.cs
+    
 ---
 
 ## 🚀 Getting Started (Local)
