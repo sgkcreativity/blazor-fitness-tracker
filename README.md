@@ -109,23 +109,15 @@ Id,Date,Type,DurationMin,DistanceKm,Calories,Notes
 Notes are quoted and escaped as needed.
 
 ---
-🖼️ Screenshots (recommended for recruiters)
+## 📸 Screenshots
 
-Create a docs/img/ folder and add:
+<p align="center">
+  <img src="docs/img/dashboard-light.png" alt="Dashboard (Light)" width="45%" />
+  <img src="docs/img/dashboard-dark.png"  alt="Dashboard (Dark)"  width="45%" />
+</p>
 
-docs/img/dashboard-light.png — dashboard, light mode
-
-docs/img/dashboard-dark.png — dashboard, dark mode
-
-docs/img/log-form.png — log workout form
-
-docs/img/workouts-table.png — list view with actions
-
-Then embed them here:
-![Dashboard (Light)](docs/img/dashboard-light.png)
-![Dashboard (Dark)](docs/img/dashboard-dark.png)
-![Log Workout](docs/img/log-form.png)
-![Workouts](docs/img/workouts-table.png)
+![Log Workout form](docs/img/log-form.png)
+![Workouts table](docs/img/workouts-table.png)
 
 🗺️ Roadmap
 
