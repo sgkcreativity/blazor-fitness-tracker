@@ -66,56 +66,38 @@ tests/
     
 ---
 
-## 🚀 Getting Started (Local)
+🚀 Getting Started (Local)
 
-**Prerequisite**: [.NET 8 SDK](https://dotnet.microsoft.com/download)
+#build & test
 
-```bash
-# build & test
-dotnet build
-dotnet test
+  dotnet build
 
-# run the client (prints a local URL)
+  dotnet test
+
+#run the client (prints a local URL)
+
 dotnet run --project src/FitTrack.Client/FitTrack.Client.csproj
 
-Open the URL from the console (e.g., http://localhost:5173).
-Log a workout on /log, view/manage on /workouts.
-
-Reset data: open DevTools → Application → Local Storage → remove key fittrack.workouts.v1
-or run in console: localStorage.removeItem('fittrack.workouts.v1')
-
----
-dotnet test
-Covers domain logic (pace, totals). Add more as you expand.
+#open http://localhost:5173, log on /log, view on /workouts
 
 📦 Deployment (GitHub Pages)
 
 Workflow: .github/workflows/deploy.yml
 
-On push to main, the app is published and deployed automatically.
-
-SPA fallback is enabled via 404.html, so deep links like /workouts and /log work on refresh.
+SPA fallback is enabled via 404.html.
 
 <base href> is adjusted during publish for https://sgkcreativity.github.io/blazor-fitness-tracker/.
 
 Live: https://sgkcreativity.github.io/blazor-fitness-tracker/
 
----
 📤 CSV Export
 
-Exports workouts.csv with columns:
+Exports workouts.csv with:
 
 Id,Date,Type,DurationMin,DistanceKm,Calories,Notes
 
-Notes are quoted and escaped as needed.
-
----
-## 📸 Screenshots
-
-<p align="center">
-  <img src="docs/img/dashboard-light.png" alt="Dashboard (Light)" width="45%" />
-  <img src="docs/img/dashboard-dark.png"  alt="Dashboard (Dark)"  width="45%" />
-</p>
+📸 Screenshots
+<p align="center"> <img src="docs/img/dashboard-light.png" alt="Dashboard (Light)" width="45%" /> <img src="docs/img/dashboard-dark.png" alt="Dashboard (Dark)" width="45%" /> </p>
 
 ![Log Workout form](docs/img/log-form.png)
 ![Workouts table](docs/img/workouts-table.png)
