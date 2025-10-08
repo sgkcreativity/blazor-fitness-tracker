@@ -63,6 +63,7 @@ src/
 tests/
   FitTrack.Core.Tests/
     WorkoutStatsTests.cs
+
     
 ---
 
